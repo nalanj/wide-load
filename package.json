@@ -1,0 +1,30 @@
+{
+	"name": "wide-load",
+	"version": "0.0.0",
+	"type": "module",
+	"description": "Experiment with wide events",
+	"main": "index.js",
+	"exports": {
+		".": "./index.js"
+	},
+	"scripts": {
+		"test": "node --test"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nalanj/wide-load.git"
+	},
+	"keywords": ["observability"],
+	"author": "Alan Johnson",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/nalanj/wide-load/issues"
+	},
+	"homepage": "https://github.com/nalanj/wide-load#readme",
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4"
+	},
+	"dependencies": {
+		"logfmt": "1.4.0"
+	}
+}
