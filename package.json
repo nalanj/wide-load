@@ -24,7 +24,5 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4"
 	},
-	"dependencies": {
-		"logfmt": "1.4.0"
-	}
+	"dependencies": {}
 }
