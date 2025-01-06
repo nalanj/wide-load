@@ -1,13 +1,21 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import { dbInit } from "./db.js";
 import { log } from "./log.js";
 
 // Initialize the service for generating events
-export function WideLoad(args) {
+export async function WideLoad(args) {
 	const asyncLocalStorage = new AsyncLocalStorage();
 	const svc = args.serviceName;
-	const callback = args.callback || defaultCallback;
+
+	const [dbEnqueue, dbClose] = await dbInit();
+
+	const callback = args.callback || defaultCallback(dbEnqueue);
 
 	return {
+		record: (name, data) => {
+			callback({ at: new Date(), svc, name, ...data });
+		},
+
 		event: (name, fn) => {
 			return asyncLocalStorage.run(
 				{ at: undefined, svc: undefined, name },
@@ -24,12 +32,19 @@ export function WideLoad(args) {
 			);
 		},
 
+		close() {
+			dbClose();
+		},
+
 		get current() {
 			return asyncLocalStorage.getStore();
 		},
 	};
 }
 
-function defaultCallback(logMsg) {
-	log(logMsg);
+function defaultCallback(dbEnqueue) {
+	return (logMsg) => {
+		dbEnqueue(logMsg);
+		log(logMsg);
+	};
 }

@@ -14,7 +14,9 @@
 		"type": "git",
 		"url": "git+https://github.com/nalanj/wide-load.git"
 	},
-	"keywords": ["observability"],
+	"keywords": [
+		"observability"
+	],
 	"author": "Alan Johnson",
 	"license": "MIT",
 	"bugs": {
@@ -24,5 +26,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4"
 	},
-	"dependencies": {}
+	"dependencies": {
+		"@duckdb/node-api": "1.1.3-alpha.8"
+	}
 }
