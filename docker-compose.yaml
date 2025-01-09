@@ -1,0 +1,12 @@
+services:
+  minio:
+    image: quay.io/minio/minio
+    command: server /data --address :31008 --console-address :31009
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: miniominio
+    ports:
+      - "31008:31008"
+      - "31009:31009"
+    volumes:
+      - ./tmp/minio:/data
