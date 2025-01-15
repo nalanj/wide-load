@@ -14,9 +14,7 @@ for (let i = 0; i < iterations; i++) {
 		wl.current.blah = "something\ncool";
 	});
 
-	if (delay) {
-		await setTimeout(delay);
-	}
+	await setTimeout(delay);
 }
 
 await wl.close();
