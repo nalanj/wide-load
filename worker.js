@@ -7,15 +7,16 @@ const queue = [];
 
 parentPort.on("message", async ([type, msg]) => {
 	if (type === "log") {
-		queue.unshift(async () => await log(msg));
+		queue.push(async () => await log(msg));
 		doWork();
 	}
 
 	if (type === "close") {
-		queue.unshift(async () => {
+		queue.push(async () => {
 			await close();
 			parentPort.postMessage("closed");
 		});
+		doWork();
 	}
 });
 

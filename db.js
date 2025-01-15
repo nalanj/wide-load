@@ -55,7 +55,7 @@ export async function dbInit() {
 
 			rowCount++;
 
-			if (rowCount >= 1000) {
+			if (rowCount >= 10000) {
 				appender.flush();
 				await flush(conn);
 				rowCount = 0;
@@ -71,15 +71,10 @@ export async function dbInit() {
 }
 
 async function flush(conn) {
-	try {
-		await conn.run("BEGIN TRANSACTION;");
-		await conn.run(
-			"COPY wide_events TO 's3://wide-events/data' (FORMAT PARQUET, APPEND true, PARTITION_BY( year, month, day, hour, svc ));",
-		);
-		await conn.run("DELETE FROM wide_events;");
-		await conn.run("COMMIT;");
-	} catch (e) {
-		console.error(e);
-		await conn.run("ROLLBACK;");
-	}
+	await conn.run("BEGIN TRANSACTION;");
+	await conn.run(
+		"COPY wide_events TO 's3://wide-events/data' (FORMAT PARQUET, APPEND true, PARTITION_BY( year, month, day, hour, svc ));",
+	);
+	await conn.run("DELETE FROM wide_events;");
+	await conn.run("COMMIT;");
 }

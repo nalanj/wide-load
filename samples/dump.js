@@ -12,6 +12,7 @@ wl.record("start", { iterations, delay });
 for (let i = 0; i < iterations; i++) {
 	wl.event("testing", () => {
 		wl.current.blah = "something\ncool";
+		wl.current.i = i;
 	});
 
 	await setTimeout(delay);
