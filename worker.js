@@ -1,7 +1,8 @@
-import { parentPort } from "node:worker_threads";
+import { parentPort, workerData } from "node:worker_threads";
 import { dbInit } from "./db.js";
 
-const [log, close] = await dbInit();
+const batchSize = workerData.batchSize;
+const [log, close] = await dbInit(batchSize);
 
 const queue = [];
 

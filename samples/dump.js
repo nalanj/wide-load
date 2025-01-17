@@ -1,7 +1,7 @@
 import { setTimeout } from "node:timers/promises";
 import { WideLoad } from "../index.js";
 
-const wl = await WideLoad({ serviceName: "dump" });
+const wl = await WideLoad({ svc: "dump" });
 
 const iterations = process.argv[2] || 1000;
 const delay = process.argv[3] || 0;

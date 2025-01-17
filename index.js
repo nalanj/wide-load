@@ -3,21 +3,35 @@ import { Worker } from "node:worker_threads";
 import { log } from "./log.js";
 
 // Initialize the service for generating events
-export async function WideLoad(args) {
+export async function WideLoad({
+	svc = "[unknown]",
+	batchSize = 10000,
+	callback,
+}) {
 	const asyncLocalStorage = new AsyncLocalStorage();
-	const svc = args.serviceName;
+	const worker = new Worker(new URL("./worker.js", import.meta.url), {
+		workerData: { batchSize },
+	});
+	callback ||= defaultCallback(worker);
 
-	const worker = new Worker(new URL("./worker.js", import.meta.url));
-
-	const callback = args.callback || defaultCallback(worker);
+	let closed = false;
 
 	return {
 		record: (name, data = {}) => {
-			const { at = new Date(), ...rest } = data;
+			if (closed) {
+				throw new Error("WideLoad instance is closed");
+			}
+
+			const at = new Date();
+			const { ...rest } = data;
 			callback({ at, svc, name, ...rest });
 		},
 
 		event: (name, fn) => {
+			if (closed) {
+				throw new Error("WideLoad instance is closed");
+			}
+
 			return asyncLocalStorage.run(
 				{ at: undefined, svc: undefined, name },
 				() => {
@@ -34,6 +48,7 @@ export async function WideLoad(args) {
 		},
 
 		async close() {
+			closed = true;
 			await new Promise((resolve) => {
 				worker.on("message", () => {
 					resolve();
