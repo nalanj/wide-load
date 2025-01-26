@@ -1,14 +1,27 @@
-export function log(logMsg, stream = process.stdout) {
+import type { Writable } from "node:stream";
+import type { ValueOf } from "type-fest";
+
+type LogMessage = {
+	[key: string]: string | number | Date | boolean;
+};
+
+export function log(
+	logMsg: LogMessage,
+	stream: Writable = process.stdout,
+): void {
 	stream.write(`${logLine(logMsg)}\n`);
 }
 
-export function logLine(logMsg) {
+export function logLine(logMsg: LogMessage): string {
 	return Object.entries(logMsg)
 		.map(([key, value]) => logAttr(key, value))
 		.join(" ");
 }
 
-export function logAttr(key, value) {
+export function logAttr(
+	key: keyof LogMessage,
+	value: ValueOf<LogMessage>,
+): string {
 	let stringValue = JSON.stringify(value);
 	if (value instanceof Date) {
 		stringValue = value.toISOString();
