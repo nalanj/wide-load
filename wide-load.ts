@@ -1,29 +1,30 @@
-import { spawn } from "node:child_process";
 import { argv, stderr, stdout } from "node:process";
+import { finish, start } from "./wlproc.js";
 
-const startedAt = process.hrtime.bigint();
+const proc = start(argv[2] || "", argv.slice(3), (stream, data) => {
+	if (stream === "stderr") {
+		stderr.write(data);
+	} else if (stream === "stdout") {
+		stdout.write(data);
+	}
+});
 
-const cmd = argv[2];
-if (!cmd) {
-	console.error("Usage: wide-load <command> [args...]");
-	process.exit(1);
+process.on("SIGINT", () => {
+	proc.child.kill("SIGINT");
+});
+
+process.on("SIGTERM", () => {
+	proc.child.kill("SIGTERM");
+});
+
+const result = await finish(proc);
+
+console.log(
+	`child process exited with code ${result.code}, ${result.signal}, duration: ${result.duration / 1000000n}.${result.duration % 1000000n}ms`,
+);
+
+if (result.code) {
+	process.exit(result.code);
 }
 
-const args = argv.slice(3);
-
-const child = spawn(cmd, args);
-
-child.stdout.on("data", (data) => {
-	stdout.write(data);
-});
-
-child.stderr.on("data", (data) => {
-	stderr.write(data);
-});
-
-child.on("close", (code, signal) => {
-	const duration = process.hrtime.bigint() - startedAt;
-	console.log(
-		`child process exited with code ${code}, ${signal}, duration: ${duration / 1000000n}.${duration % 1000000n}ms`,
-	);
-});
+process.exit(1);
