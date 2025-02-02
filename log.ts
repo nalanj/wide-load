@@ -1,8 +1,10 @@
 import type { Writable } from "node:stream";
-import type { ValueOf } from "type-fest";
+
+type LogMessageValueNonEmpty = string | number | bigint | Date | boolean;
+type LogMessageValue = LogMessageValueNonEmpty | null | undefined;
 
 type LogMessage = {
-	[key: string]: string | number | Date | boolean;
+	[key: string]: LogMessageValue;
 };
 
 export function log(
@@ -14,15 +16,17 @@ export function log(
 
 export function logLine(logMsg: LogMessage): string {
 	return Object.entries(logMsg)
+		.filter((entry) => entry[1] !== undefined && entry[1] !== null)
 		.map(([key, value]) => logAttr(key, value))
 		.join(" ");
 }
 
-export function logAttr(
-	key: keyof LogMessage,
-	value: ValueOf<LogMessage>,
-): string {
-	let stringValue = JSON.stringify(value);
+export function logAttr(key: keyof LogMessage, value: LogMessageValue): string {
+	if (value === null || value === undefined) {
+		return "";
+	}
+
+	let stringValue: string;
 	if (value instanceof Date) {
 		stringValue = value.toISOString();
 	} else {

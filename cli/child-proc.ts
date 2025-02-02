@@ -3,12 +3,12 @@ import { type ChildProcess, spawn } from "node:child_process";
 type StdStream = "stdout" | "stderr";
 type WLOutputFn = (stream: StdStream, data: string) => void;
 
-type WLProc = {
+type ChildProc = {
 	child: ChildProcess;
 	startedAt: bigint;
 };
 
-export type WLProcResult = {
+export type ChildProcResult = {
 	code: number | null;
 	signal: string | null;
 	duration: bigint;
@@ -18,7 +18,7 @@ export function start(
 	command: string,
 	args: string[],
 	onOutput: WLOutputFn,
-): WLProc {
+): ChildProc {
 	const startedAt = process.hrtime.bigint();
 	const child = spawn(command, args, {
 		stdio: ["pipe", "pipe", "pipe", "ipc"],
@@ -35,7 +35,7 @@ export function start(
 	return { child, startedAt };
 }
 
-export async function finish(proc: WLProc): Promise<WLProcResult> {
+export async function finish(proc: ChildProc): Promise<ChildProcResult> {
 	return new Promise((resolve) => {
 		proc.child.on("close", (code: number, signal: string) => {
 			const duration = process.hrtime.bigint() - proc.startedAt;

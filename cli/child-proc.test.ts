@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { finish, start } from "./wlproc.ts";
+import { finish, start } from "./child-proc.ts";
 
 describe("run", () => {
 	it("runs a successful command", async () => {
